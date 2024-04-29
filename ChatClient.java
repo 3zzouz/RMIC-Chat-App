@@ -3,15 +3,19 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+//on implemente l'interface ChatInterface pour pouvoir 
+//utiliser les methodes du serveur qui sont décrites dans cette interface
+//on etend UnicastRemoteObject pour pouvoir appeler les
+//methodes de cette classe a distance
 public class ChatClient extends UnicastRemoteObject implements ChatInterface {
     private ChatInterface server;
     private ChatGUI chatGUI;
     private String name;
 
-    public ChatClient(String host, int port,String name) throws RemoteException, NotBoundException {
+    public ChatClient(String host, int port, String name) throws RemoteException, NotBoundException {
         super();
         this.name = name;
         Registry registry = LocateRegistry.getRegistry(host, port);
@@ -19,15 +23,20 @@ public class ChatClient extends UnicastRemoteObject implements ChatInterface {
         server.registerClient(this);
     }
 
-    public void sendMessage(String message) throws RemoteException {
-        String timeSent = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        message = this.name + " (" + timeSent + "): " + message;
-        server.sendMessage(message);
+    public void sendMessage(String message) {
+        try {
+            String timestamp = new SimpleDateFormat("HH:mm:ss").format(new Date());
+            String formattedMessage = this.name + " (" + timestamp + "): " + message;
+            server.sendMessage(formattedMessage);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void receiveMessage(String message) throws RemoteException {
-        chatGUI.displayMessage(message);
+        boolean isSender = message.startsWith(this.name);
+        chatGUI.displayMessage(message, isSender);
     }
 
     @Override

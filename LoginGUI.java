@@ -19,7 +19,7 @@ public class LoginGUI {
                 if (!name.isEmpty()) {
                     try {
                         ChatClient chatClient = new ChatClient("localhost", 1099, name);
-                        ChatGUI chatGUI = new ChatGUI(chatClient);
+                        ChatGUI chatGUI = new ChatGUI(chatClient,name);
                         chatClient.setChatGUI(chatGUI);
                         frame.dispose();
                     } catch (RemoteException | NotBoundException ex) {
