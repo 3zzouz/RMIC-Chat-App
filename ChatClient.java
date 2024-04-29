@@ -1,26 +1,23 @@
+import java.util.List;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-//on implemente l'interface ChatInterface pour pouvoir 
-//utiliser les methodes du serveur qui sont décrites dans cette interface
-//on etend UnicastRemoteObject pour pouvoir appeler les
-//methodes de cette classe a distance
-public class ChatClient extends UnicastRemoteObject implements ChatInterface {
+public class ChatClient {
     private ChatInterface server;
     private ChatGUI chatGUI;
     private String name;
+    private int lastDisplayedMessageIndex = 0;
 
-    public ChatClient(String host, int port, String name) throws RemoteException, NotBoundException {
-        super();
+    public ChatClient(String name) throws RemoteException, NotBoundException {
         this.name = name;
-        Registry registry = LocateRegistry.getRegistry(host, port);
-        server = (ChatInterface) registry.lookup("ChatServer");
-        server.registerClient(this);
+        Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+        this.server = (ChatInterface) registry.lookup("ChatServer");
+        setChatGUI(new ChatGUI(this, name));
+        this.startFetchingMessages();
     }
 
     public void sendMessage(String message) {
@@ -33,18 +30,35 @@ public class ChatClient extends UnicastRemoteObject implements ChatInterface {
         }
     }
 
-    @Override
-    public void receiveMessage(String message) throws RemoteException {
-        boolean isSender = message.startsWith(this.name);
-        chatGUI.displayMessage(message, isSender);
-    }
-
-    @Override
-    public void registerClient(ChatInterface client) throws RemoteException {
-        // This method is not used in the client
-    }
-
     public void setChatGUI(ChatGUI chatGUI) {
         this.chatGUI = chatGUI;
+    }
+
+    public void getAllMessages() {
+        List<String> messages;
+        try {
+            messages = server.getAllMessages();
+            for (int i = lastDisplayedMessageIndex; i < messages.size(); i++) {
+                String msg = messages.get(i);
+                boolean isSender = msg.startsWith(this.name);
+                chatGUI.displayMessage(msg, isSender);
+            }
+            lastDisplayedMessageIndex = messages.size();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void startFetchingMessages() {
+        new Thread(() -> {
+            while (true) {
+                this.getAllMessages();
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }

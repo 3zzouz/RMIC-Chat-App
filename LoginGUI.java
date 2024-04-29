@@ -18,9 +18,7 @@ public class LoginGUI {
                 String name = nameField.getText();
                 if (!name.isEmpty()) {
                     try {
-                        ChatClient chatClient = new ChatClient("localhost", 1099, name);
-                        ChatGUI chatGUI = new ChatGUI(chatClient,name);
-                        chatClient.setChatGUI(chatGUI);
+                        new ChatClient(name);
                         frame.dispose();
                     } catch (RemoteException | NotBoundException ex) {
                         ex.printStackTrace();

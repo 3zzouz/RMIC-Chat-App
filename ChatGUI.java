@@ -62,4 +62,7 @@ public class ChatGUI {
                 + currentText.substring(bodyCloseIndex);
         chatPane.setText(newText);
     }
+    public void clearOutput() {
+        chatPane.setText("");
+    }
 }
