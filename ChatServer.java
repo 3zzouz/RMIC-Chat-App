@@ -36,6 +36,7 @@ public class ChatServer extends UnicastRemoteObject implements ChatInterface {
     public boolean login(String username, String password) throws RemoteException {
         for (User u : users) {
             if (u.getUsername().equals(username) && u.getPassword().equals(password)) {
+                u.setLoggedIn(true);
                 return true;
             }
         }
@@ -50,5 +51,15 @@ public class ChatServer extends UnicastRemoteObject implements ChatInterface {
             }
         }
         return false;
+    }
+
+    @Override
+    public void logout(String username) throws RemoteException {
+        for (User u : users) {
+            if (u.getUsername().equals(username)) {
+                u.setLoggedIn(false);
+                break;
+            }
+        }
     }
 }

@@ -1,5 +1,7 @@
 import javax.swing.*;
-
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.rmi.RemoteException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,9 +12,9 @@ public class ChatGUI {
     private JTextField messageField;
     private JButton sendButton;
 
-    public ChatGUI(ChatClient chatClient, String clientName) {
+    public ChatGUI(ChatClient chatClient, String clientName,ChatInterface server) {
 
-        frame = new JFrame("Chat Application :"+clientName);
+        frame = new JFrame("Chat Application :" + clientName);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 500);
 
@@ -29,6 +31,15 @@ public class ChatGUI {
         bottomPanel.add(messageField);
 
         sendButton = new JButton("Send");
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                try {
+                    server.logout(clientName);
+                } catch (RemoteException remoteException) {
+                    remoteException.printStackTrace();
+                }
+            }
+        });
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -39,7 +50,7 @@ public class ChatGUI {
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
-                    //displayMessage(message, true);
+                    // displayMessage(message, true);
                     messageField.setText("");
                 }
             }
@@ -62,6 +73,7 @@ public class ChatGUI {
                 + currentText.substring(bodyCloseIndex);
         chatPane.setText(newText);
     }
+
     public void clearOutput() {
         chatPane.setText("");
     }

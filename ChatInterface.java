@@ -11,4 +11,6 @@ public interface ChatInterface extends Remote {
     boolean login(String username, String password) throws RemoteException;
 
     boolean isLoggedIn(String username) throws RemoteException;
+
+    void logout(String username) throws RemoteException;
 }

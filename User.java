@@ -19,4 +19,8 @@ public class User implements java.io.Serializable {
     public boolean isLoggedIn() {
         return this.loggedIn;
     }
+
+    public void setLoggedIn(boolean loggedIn) {
+        this.loggedIn = loggedIn;
+    }
 }

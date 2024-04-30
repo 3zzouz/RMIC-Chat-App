@@ -3,6 +3,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.awt.FlowLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class RegistrationGUI {
     private JTextField usernameField;
@@ -50,6 +52,15 @@ public class RegistrationGUI {
                     }
                 } catch (RemoteException ex) {
                     ex.printStackTrace();
+                }
+            }
+        });
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                try {
+                    new LoginGUI(server);
+                } catch (Exception remoteException) {
+                    remoteException.printStackTrace();
                 }
             }
         });

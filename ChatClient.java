@@ -16,7 +16,7 @@ public class ChatClient {
         this.name = name;
         Registry registry = LocateRegistry.getRegistry("localhost", 1099);
         this.server = (ChatInterface) registry.lookup("ChatServer");
-        setChatGUI(new ChatGUI(this, name));
+        setChatGUI(new ChatGUI(this, name,server));
         this.startFetchingMessages();
     }
 
